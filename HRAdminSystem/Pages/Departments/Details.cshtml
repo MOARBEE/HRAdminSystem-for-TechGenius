@@ -1,0 +1,39 @@
+﻿@page
+@model HRAdminSystem.Pages.Departments.DetailsModel
+@{
+    ViewData["Title"] = "Department Details";
+}
+
+<h1>Department Details</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Name</dt>
+        <dd class="col-sm-10">@Model.Department.Name</dd>
+
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Model.Department.Status</dd>
+
+        <dt class="col-sm-2">Employees</dt>
+        <dd class="col-sm-10">
+            @if (Model.Department.Employees.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var employee in Model.Department.Employees)
+                    {
+                        <li>@employee</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span>No employees assigned</span>
+            }
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Department.Id" class="btn btn-primary">Edit</a>
+    <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
+</div>

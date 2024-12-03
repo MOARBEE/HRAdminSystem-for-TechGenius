@@ -1,0 +1,56 @@
+﻿@page
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@model HRAdminSystem.Pages.Employees.IndexModel
+@{
+    ViewData["Title"] = "Employees";
+    var currentUser = await UserManager.GetUserAsync(User);
+    var isHRAdmin = User.IsInRole("HRAdmin");
+}
+
+<h1>Employees</h1>
+<div>Current user roles: @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))</div>
+
+@if (isHRAdmin)
+{
+    <p>
+        <a asp-page="Create" class="btn btn-primary">Create New</a>
+    </p>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Manager</th>
+            <th>Departments</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Employees)
+        {
+            @if (isHRAdmin || currentUser.Email == item.EmailAddress)
+            {
+                <tr>
+                    <td>@item.FirstName @item.LastName</td>
+                    <td>@item.EmailAddress</td>
+                    <td>@item.TelephoneNumber</td>
+                    <td>@item.ManagerName</td>
+                    <td>@string.Join(", ", item.Departments)</td>
+                    <td>@item.Status</td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
+                        @if (isHRAdmin)
+                        {
+                            <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

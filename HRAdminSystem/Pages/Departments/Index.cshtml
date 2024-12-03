@@ -1,0 +1,39 @@
+﻿@page
+@model HRAdminSystem.Pages.Departments.IndexModel
+@{
+    ViewData["Title"] = "Departments";
+}
+
+<h1>Departments</h1>
+
+@if (User.IsInRole("HRAdmin"))
+{
+    <p>
+        <a asp-page="Create" class="btn btn-primary">Create New</a>
+    </p>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Employee Count</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Departments)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Status</td>
+                <td>@item.EmployeeCount</td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
+                    <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
