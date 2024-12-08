@@ -13,6 +13,22 @@
     </p>
 }
 
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form method="get">
+            <div class="input-group">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Search by name..." value="@Model.SearchTerm">
+                <select name="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="Active" selected="@(Model.StatusFilter == HRAdminSystem.Enums.Status.Active)">Active</option>
+                    <option value="Inactive" selected="@(Model.StatusFilter == HRAdminSystem.Enums.Status.Inactive)">Inactive</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -32,6 +48,20 @@
                 <td>
                     <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
                     <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                    @if (User.IsInRole("HRAdmin"))
+                    {
+                        <form method="post" style="display: inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            @if (item.Status == HRAdminSystem.Enums.Status.Active)
+                            {
+                                <button type="submit" asp-page-handler="Deactivate" class="btn btn-warning btn-sm">Deactivate</button>
+                            }
+                            else
+                            {
+                                <button type="submit" asp-page-handler="Activate" class="btn btn-success btn-sm">Activate</button>
+                            }
+                        </form>
+                    }
                 </td>
             </tr>
         }

@@ -1,22 +1,40 @@
 ﻿@page
-@using Microsoft.AspNetCore.Identity
-@inject UserManager<IdentityUser> UserManager
 @model HRAdminSystem.Pages.Employees.IndexModel
 @{
     ViewData["Title"] = "Employees";
-    var currentUser = await UserManager.GetUserAsync(User);
-    var isHRAdmin = User.IsInRole("HRAdmin");
 }
 
 <h1>Employees</h1>
-<div>Current user roles: @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))</div>
 
-@if (isHRAdmin)
+@if (User.IsInRole("HRAdmin"))
 {
     <p>
         <a asp-page="Create" class="btn btn-primary">Create New</a>
     </p>
 }
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <form method="get">
+            <div class="input-group">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Search by name or email..." value="@Model.SearchTerm">
+                <select name="departmentId" class="form-select">
+                    <option value="">All Departments</option>
+                    @foreach (var dept in Model.DepartmentsList)
+                    {
+                        <option value="@dept.Id" selected="@(Model.DepartmentId == dept.Id)">@dept.Name</option>
+                    }
+                </select>
+                <select name="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="Active" selected="@(Model.StatusFilter == HRAdminSystem.Enums.Status.Active)">Active</option>
+                    <option value="Inactive" selected="@(Model.StatusFilter == HRAdminSystem.Enums.Status.Inactive)">Inactive</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <table class="table">
     <thead>
@@ -33,24 +51,32 @@
     <tbody>
         @foreach (var item in Model.Employees)
         {
-            @if (isHRAdmin || currentUser.Email == item.EmailAddress)
-            {
-                <tr>
-                    <td>@item.FirstName @item.LastName</td>
-                    <td>@item.EmailAddress</td>
-                    <td>@item.TelephoneNumber</td>
-                    <td>@item.ManagerName</td>
-                    <td>@string.Join(", ", item.Departments)</td>
-                    <td>@item.Status</td>
-                    <td>
-                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
-                        @if (isHRAdmin)
-                        {
-                            <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
-                        }
-                    </td>
-                </tr>
-            }
+            <tr>
+                <td>@item.FirstName @item.LastName</td>
+                <td>@item.EmailAddress</td>
+                <td>@item.TelephoneNumber</td>
+                <td>@item.ManagerName</td>
+                <td>@string.Join(", ", item.Departments)</td>
+                <td>@item.Status</td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
+                    <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                    @if (User.IsInRole("HRAdmin"))
+                    {
+                        <form method="post" style="display: inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            @if (item.Status == HRAdminSystem.Enums.Status.Active)
+                            {
+                                <button type="submit" asp-page-handler="Deactivate" class="btn btn-warning btn-sm">Deactivate</button>
+                            }
+                            else
+                            {
+                                <button type="submit" asp-page-handler="Activate" class="btn btn-success btn-sm">Activate</button>
+                            }
+                        </form>
+                    }
+                </td>
+            </tr>
         }
     </tbody>
 </table>
